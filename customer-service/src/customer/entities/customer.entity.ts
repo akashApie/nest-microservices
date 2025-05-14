@@ -19,4 +19,7 @@ export class Customer {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column('uuid', { array: true, default: () => "'{}'" })
+  orderIds: string[];
 }

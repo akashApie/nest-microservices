@@ -55,6 +55,15 @@ export class CustomerService {
     return updatedCustomer;
   }
 
+  async addOrderToCustomer(customerId: string, orderId: string): Promise<void> {
+    const customer = await this.findOne(customerId);
+    if (!customer.orderIds) customer.orderIds = [];
+    if (!customer.orderIds.includes(orderId)) {
+      customer.orderIds.push(orderId);
+      await this.customerRepository.save(customer);
+    }
+  }
+
   async remove(id: string): Promise<void> {
     const customer = await this.findOne(id);
     

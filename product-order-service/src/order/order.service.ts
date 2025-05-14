@@ -90,36 +90,26 @@ export class OrderService {
 
   // Customer event handling methods
   async processCustomerCreated(customerData: any): Promise<void> {
-    // Process customer created event
-    // For example, you might want to store minimal customer info in a local table
-    // This implementation depends on your specific requirements
+    // (Optional) Store minimal customer info locally if you want denormalized data
+    // Example: await this.customerRepository.save({ id: customerData.id, name: customerData.name });
     console.log('Processing customer created:', customerData);
   }
 
   async processCustomerUpdated(customerData: any): Promise<void> {
-    // Process customer updated event
-    // Update any local customer data if you're storing denormalized data
+    // (Optional) Update denormalized customer data in orders
+    // Example: await this.orderRepository.update({ customerId: customerData.id }, { customerName: customerData.name });
     console.log('Processing customer updated:', customerData);
-    
-    // Example: Update customer name in orders if you store it denormalized
-    // await this.orderRepository.update(
-    //   { customerId: customerData.id },
-    //   { customerName: customerData.name }
-    // );
   }
 
   async processCustomerDeleted(customerId: string): Promise<void> {
-    // Process customer deleted event
-    // This might involve marking orders as orphaned or implementing a specific business logic
+    // Mark all orders for this customer as 'customer-deleted'
     console.log('Processing customer deleted, customerId:', customerId);
-    
-    // Example: Mark orders as 'customer-deleted' or handle according to business rules
-    // await this.orderRepository.update(
-    //   { customerId },
-    //   { status: 'customer-deleted' }
-    // );
+    await this.orderRepository.update(
+      { customerId },
+      { status: 'customer-deleted' }
+    );
   }
-  
+
   async verifyCustomer(customerId: string): Promise<boolean> {
     // Use RabbitMQ client to check if customer exists in Customer service
     try {

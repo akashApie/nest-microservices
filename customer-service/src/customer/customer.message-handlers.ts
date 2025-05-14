@@ -26,4 +26,11 @@ export class CustomerMessageHandlers {
       return false;
     }
   }
+
+  @MessagePattern('order_created')
+  async handleOrderCreated(orderData: any) {
+    // orderData should contain: id (orderId), customerId
+    if (!orderData?.customerId || !orderData?.id) return;
+    await this.customerService.addOrderToCustomer(orderData.customerId, orderData.id);
+  }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
@@ -7,9 +7,13 @@ import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../product/entities/product.entity';
 import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CustomerCreatedEvent, CustomerUpdatedEvent } from '../messaging/events/customer-events';
+import { OrderCreatedEvent } from '../messaging/events/order-events';
 
 @Injectable()
 export class OrderService {
+  private readonly logger = new Logger(OrderService.name);
+  
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
@@ -88,22 +92,33 @@ export class OrderService {
     await this.orderRepository.remove(order);
   }
 
-  // Customer event handling methods
-  async processCustomerCreated(customerData: any): Promise<void> {
-    // (Optional) Store minimal customer info locally if you want denormalized data
-    // Example: await this.customerRepository.save({ id: customerData.id, name: customerData.name });
-    console.log('Processing customer created:', customerData);
+  // Find orders by customer ID
+  async findOrdersByCustomerId(customerId: string): Promise<Order[]> {
+    this.logger.log(`Finding orders for customer: ${customerId}`);
+    return this.orderRepository.find({
+      where: { customerId },
+      relations: ['items', 'items.product'],
+      order: { orderDate: 'DESC' }
+    });
   }
 
-  async processCustomerUpdated(customerData: any): Promise<void> {
+  // Customer event handling methods
+  async processCustomerCreated(customerData: CustomerCreatedEvent): Promise<void> {
+    // (Optional) Store minimal customer info locally if you want denormalized data
+    this.logger.log(`Processing customer created: ${JSON.stringify(customerData)}`);
+    // In a production app, you might store denormalized customer data
+    // Example: await this.customerRepository.save({ id: customerData.id, name: customerData.name });
+  }
+
+  async processCustomerUpdated(customerData: CustomerUpdatedEvent): Promise<void> {
     // (Optional) Update denormalized customer data in orders
+    this.logger.log(`Processing customer updated: ${JSON.stringify(customerData)}`);
     // Example: await this.orderRepository.update({ customerId: customerData.id }, { customerName: customerData.name });
-    console.log('Processing customer updated:', customerData);
   }
 
   async processCustomerDeleted(customerId: string): Promise<void> {
     // Mark all orders for this customer as 'customer-deleted'
-    console.log('Processing customer deleted, customerId:', customerId);
+    this.logger.log(`Processing customer deleted, customerId: ${customerId}`);
     await this.orderRepository.update(
       { customerId },
       { status: 'customer-deleted' }

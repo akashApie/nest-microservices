@@ -10,7 +10,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const logger = app.get(AppLogger);
+  const logger = await app.resolve(AppLogger);
 
   // Setup Swagger
   const swaggerConfig = new DocumentBuilder()
@@ -33,21 +33,12 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: '0.0.0.0',
-      port: configService.get<number>('TCP_PORT') || 3002
+      port: configService.get<number>('TCP_PORT') || 3004
     }
   } as ClientProvider);
 
-  // Configure product service client
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.TCP,
-    options: {
-      host: '0.0.0.0',
-      port: configService.get<number>('PRODUCT_TCP_PORT') || 3002
-    }
-  });
-
   await app.startAllMicroservices();
-  const port = configService.get<number>('PORT') || 3001;
+  const port = configService.get<number>('PORT') || 3002;
   await app.listen(port);
   logger.log(`Product-Order service is running on port ${port}`);
   logger.log(`Swagger UI available at /api`);

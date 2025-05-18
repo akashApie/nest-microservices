@@ -9,6 +9,7 @@ import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderCreatedEvent } from '../messaging/events/order-events';
 import { CustomerCreatedEvent, CustomerUpdatedEvent } from '@customer-service/messaging/events/customer-events';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class OrderService {
@@ -21,15 +22,15 @@ export class OrderService {
     private readonly orderItemRepository: Repository<OrderItem>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    @Inject('RMQ_SERVICE') private readonly client: ClientProxy,
+    private readonly httpService: HttpService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     // Verify customer exists in Customer service
-    const customerExists = await this.verifyCustomer(createOrderDto.customerId);
-    if (!customerExists) {
-      throw new BadRequestException(`Customer with ID ${createOrderDto.customerId} not found`);
-    }
+    // const customerExists = await this.verifyCustomer(createOrderDto.customerId);
+    // if (!customerExists) {
+    //   throw new BadRequestException(`Customer with ID ${createOrderDto.customerId} not found`);
+    // }
     
     // Validate and fetch products
     const items: OrderItem[] = [];
@@ -60,13 +61,13 @@ export class OrderService {
     const savedOrder = await this.orderRepository.save(order);
     
     // Emit order created event
-    this.client.emit('order_created', {
-      id: savedOrder.id,
-      customerId: savedOrder.customerId,
-      status: savedOrder.status,
-      totalAmount: savedOrder.totalAmount,
-      orderDate: savedOrder.orderDate
-    });
+    // this.client.emit('order_created', {
+    //   id: savedOrder.id,
+    //   customerId: savedOrder.customerId,
+    //   status: savedOrder.status,
+    //   totalAmount: savedOrder.totalAmount,
+    //   orderDate: savedOrder.orderDate
+    // });
     
     return savedOrder;
   }
@@ -125,13 +126,14 @@ export class OrderService {
     );
   }
 
-  async verifyCustomer(customerId: string): Promise<boolean> {
-    // Use RabbitMQ client to check if customer exists in Customer service
-    try {
-      return await this.client.send('check_customer_exists', customerId).toPromise();
-    } catch (error) {
-      console.error('Error verifying customer:', error);
-      return false;
+    async verifyCustomer(customerId: string): Promise<boolean> {
+      try {
+        const response = await this.httpService.get(`http://localhost:3003/customers/${customerId}/verify`).toPromise();
+        console.log('response', response);
+        return response?.data.exists;
+      } catch (error) {
+        this.logger.error('Error verifying customer:', error);
+        return false;
+      }
     }
-  }
 }

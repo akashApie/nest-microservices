@@ -1,11 +1,9 @@
 {
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
-  "/cart": "pages/cart.html",
-  "/checkout": "pages/checkout.html",
-  "/orders": "pages/orders.html",
-  "/products": "pages/products.html",
-  "/": "pages/index.html",
   "/_document": "pages/_document.js",
-  "/404": "pages/404.html"
+  "/products": "pages/products.js",
+  "/orders": "pages/orders.js",
+  "/cart": "pages/cart.js",
+  "/checkout": "pages/checkout.js"
 }

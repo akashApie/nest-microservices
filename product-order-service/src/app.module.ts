@@ -7,12 +7,16 @@ import { OrderModule } from './order/order.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AppLogger } from './logger/logger.service';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development' }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => typeOrmConfig,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: typeOrmConfig,
     }),
     ProductModule,
     OrderModule,
@@ -21,11 +25,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       transport: Transport.TCP,
       options: {
         host: '0.0.0.0',
-        port: 3001
+        port: 4001
       }
     }]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppLogger, {
+    provide: AllExceptionsFilter,
+    useClass: AllExceptionsFilter
+  }],
 })
 export class AppModule {}

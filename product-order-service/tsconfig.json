@@ -18,7 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@customer-service/*": ["../customer-service/src/*"]
+      "@customer-service/*": ["..\\customer-service\\src\\*"],
+      "@customer-service/messaging/events/*": ["..\\customer-service\\src\\messaging\\events\\*"]
     }
   },
   "include": ["src"]

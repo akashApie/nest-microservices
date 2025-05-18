@@ -12,7 +12,7 @@ export class Customer {
   email: string;
 
   @Column({ nullable: true })
-  address: string;
+  address?: string;
 
   @CreateDateColumn()
   created_at: Date;

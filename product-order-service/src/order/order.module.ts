@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderService } from './order.service';
@@ -10,6 +11,7 @@ import { ProductModule } from '../product/product.module';
 
 @Module({
   imports: [
+    HttpModule,
     TypeOrmModule.forFeature([Order, OrderItem]),
     RmqClientModule,
     ProductModule

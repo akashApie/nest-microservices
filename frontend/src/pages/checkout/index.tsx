@@ -5,6 +5,7 @@ import { getCart, clearCart, getCartTotal } from '../../utils/cartStorage';
 import { createCustomer, createOrder } from '../../utils/api';
 import { CartItem } from '../../types';
 import toast from 'react-hot-toast';
+import { formatPrice, formatCurrency } from '../../utils/format';
 
 const CheckoutPage: React.FC = () => {
   const router = useRouter();
@@ -40,6 +41,10 @@ const CheckoutPage: React.FC = () => {
     
     try {
       setLoading(true);
+      console.log('Submitting order...',name,
+        email,
+        phone,
+        address);
       
       // 1. Create/get customer
       const customer = await createCustomer({
@@ -49,13 +54,20 @@ const CheckoutPage: React.FC = () => {
         address
       });
       
+      console.log('Customer:', customer);
+      
       // 2. Create order
       const order = await createOrder(customer.id, cartItems);
-      
+      console.log('Order:', order); 
       // 3. Clear cart
       clearCart();
       
-      // 4. Show success and redirect to order confirmation
+      // 4. Save customer ID to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('customerId', customer.id);
+      }
+      
+      // 5. Show success and redirect to order confirmation
       toast.success('Order placed successfully!');
       router.push('/orders');
       
@@ -144,9 +156,9 @@ const CheckoutPage: React.FC = () => {
                   <div key={item.productId} className="py-3 flex justify-between">
                     <div>
                       <p className="font-medium">{item.product.name}</p>
-                      <p className="text-sm text-gray-500">{item.quantity} x ${item.product.price.toFixed(2)}</p>
+                      <p className="text-sm text-gray-500">{item.quantity} x {formatCurrency(item.product.price)}</p>
                     </div>
-                    <p className="font-medium">${(item.product.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-medium">{formatCurrency(item.product.price * item.quantity)}</p>
                   </div>
                 ))}
               </div>
@@ -154,7 +166,7 @@ const CheckoutPage: React.FC = () => {
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex justify-between text-lg font-bold">
                   <p>Total</p>
-                  <p>${total.toFixed(2)}</p>
+                  <p>{formatCurrency(total)}</p>
                 </div>
               </div>
             </div>

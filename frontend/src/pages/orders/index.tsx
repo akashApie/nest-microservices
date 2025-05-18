@@ -29,8 +29,9 @@ const OrdersPage: React.FC = () => {
         const customerId = getCustomerIdFromStorage();
         
         if (!customerId) {
-          setError('No customer found. Please complete a purchase first.');
-          setLoading(false);
+          if (router.pathname !== '/') {
+            router.replace('/');
+          }
           return;
         }
         

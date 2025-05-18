@@ -1,23 +1,13 @@
-import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
-import { AppModule } from '../app.module';
-import { initialDataSeed } from './initial-data.seed';
-import { DataSource } from 'typeorm';
+import { seed } from './seed-customers';
 
 async function bootstrap() {
-  const logger = new Logger('Seed');
-  const app = await NestFactory.create(AppModule);
-  
-  try {
-    const dataSource = app.get(DataSource);
-    logger.log('Starting seeding process...');
-    await initialDataSeed(dataSource);
-    logger.log('Seeding completed!');
-  } catch (error) {
-    logger.error(`Seeding failed: ${error.message}`, error.stack);
-  } finally {
-    await app.close();
-  }
+  console.log('Starting customer seed...');
+  await seed();
+  console.log('Customer seed completed!');
+  process.exit(0);
 }
 
-bootstrap();
+bootstrap().catch(err => {
+  console.error('Error during seed:', err);
+  process.exit(1);
+});

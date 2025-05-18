@@ -21,8 +21,13 @@ async function bootstrap() {
   }));
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
-  // Enable CORS
-  app.enableCors();
+  // Enable CORS for frontend
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true
+  });
 
   // Setup Swagger
   const swaggerConfig = new DocumentBuilder()
@@ -33,29 +38,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
 
-  // Configure microservice
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [configService.get<string>('RMQ_URL') ?? 'amqp://localhost:5672'] as string[],
-      queue: 'customer_queue',
-      queueOptions: {
-        durable: true
-      },
-    }
-  });
-
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.TCP,
-    options: {
-      host: '0.0.0.0',
-      port: 3003
-    }
-  } as ClientProvider);
-
-  await app.startAllMicroservices();
-  const port = configService.get<number>('PORT') || 3000;
-  await app.listen(port);
+  // Start the service
+  const port = 3003;
+  await app.listen(port, '0.0.0.0');
   logger.log(`Customer service is running on port ${port}`);
   logger.log(`Swagger UI available at /api`);
 }

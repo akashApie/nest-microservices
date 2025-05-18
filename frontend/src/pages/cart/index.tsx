@@ -5,6 +5,11 @@ import { getCart, updateCartItemQuantity, removeFromCart, getCartTotal } from '.
 import { CartItem } from '../../types';
 import toast from 'react-hot-toast';
 
+const formatPrice = (price: any) => {
+  const num = Number(price);
+  return isNaN(num) ? '0.00' : num.toFixed(2);
+};
+
 const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [total, setTotal] = useState<number>(0);
@@ -83,7 +88,7 @@ const CartPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">${item.product.price.toFixed(2)}</div>
+                        <div className="text-sm text-gray-900">${formatPrice(item.product.price)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -103,7 +108,7 @@ const CartPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">${(item.product.price * item.quantity).toFixed(2)}</div>
+                        <div className="text-sm text-gray-900">${formatPrice(item.product.price * item.quantity)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
@@ -122,7 +127,7 @@ const CartPage: React.FC = () => {
                       Cart Total:
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-bold text-lg">
-                      ${total.toFixed(2)}
+                      ${formatPrice(total)}
                     </td>
                     <td></td>
                   </tr>

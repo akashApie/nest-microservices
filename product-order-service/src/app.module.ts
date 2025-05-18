@@ -9,9 +9,11 @@ import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppLogger } from './logger/logger.service';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { RabbitMQModule } from './messaging/rabbitmq.module';
 
 @Module({
   imports: [
+    RabbitMQModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development' }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

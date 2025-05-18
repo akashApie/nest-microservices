@@ -7,9 +7,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppLogger } from './logger/logger.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RabbitMQModule } from './messaging/rabbitmq.module';
+import { OrderConsumer } from './consumers/order.consumer';
 
 @Module({
   imports: [
+    RabbitMQModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development' }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -26,7 +29,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       }
     }]),
   ],
-  controllers: [AppController],
+  controllers: [OrderConsumer, AppController],
   providers: [AppService,AppLogger],
 })
 export class AppModule {}

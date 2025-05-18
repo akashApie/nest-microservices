@@ -61,13 +61,13 @@ const CheckoutPage: React.FC = () => {
       } else {
         const customer = await createCustomer({ name, email, phone, address });
         customerId = customer.id;
-        localStorage.setItem('customer', JSON.stringify({
-          id: customerId,
-          name,
-          email,
-          phone,
-          address
-        }));
+        // localStorage.setItem('customer', JSON.stringify({
+        //   id: customerId,
+        //   name,
+        //   email,
+        //   phone,
+        //   address
+        // }));
       }
       
       console.log('Customer:', { id: customerId, name, email, phone, address });
@@ -80,12 +80,21 @@ const CheckoutPage: React.FC = () => {
       
       // 4. Save customer ID to localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('customerId', customerId);
+        // localStorage.setItem('customerId', customerId);
       }
       
       // 5. Show success and redirect to order confirmation
       toast.success('Order placed successfully!');
-      router.push('/orders');
+      router.push({
+        pathname: '/orders',
+        query: { 
+          customerId,
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone,
+          customerAddress: address 
+        }
+      });
       
     } catch (error) {
       console.error('Error placing order:', error);

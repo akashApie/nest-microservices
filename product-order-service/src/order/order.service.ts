@@ -7,7 +7,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../product/entities/product.entity';
 import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { OrderCreatedEvent } from '../messaging/events/order-events';
+import { OrderCreatedEvent } from '../events/order-created.event';
 import { CustomerCreatedEvent, CustomerUpdatedEvent } from '@customer-service/messaging/events/customer-events';
 import { HttpService } from '@nestjs/axios';
 
@@ -23,7 +23,12 @@ export class OrderService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly httpService: HttpService,
-  ) {}
+    @Inject('RABBITMQ_SERVICE') private readonly rabbitClient: ClientProxy
+  ) {
+    if (!this.rabbitClient) {
+      throw new Error('RabbitMQ client not injected');
+    }
+  }
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     // Verify customer exists in Customer service
@@ -61,13 +66,18 @@ export class OrderService {
     const savedOrder = await this.orderRepository.save(order);
     
     // Emit order created event
-    // this.client.emit('order_created', {
-    //   id: savedOrder.id,
-    //   customerId: savedOrder.customerId,
-    //   status: savedOrder.status,
-    //   totalAmount: savedOrder.totalAmount,
-    //   orderDate: savedOrder.orderDate
-    // });
+    const event = new OrderCreatedEvent(
+      savedOrder.id,
+      savedOrder.customerId,
+      savedOrder.items.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        price: item.product.price
+      })),
+      savedOrder.totalAmount,
+      savedOrder.orderDate
+    );
+    this.rabbitClient.emit('order_created', event);
     
     return savedOrder;
   }

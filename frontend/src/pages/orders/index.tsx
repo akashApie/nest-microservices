@@ -14,13 +14,19 @@ const OrdersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Save customer ID if received from checkout
+    
+    console.log('Received customer details:', {
+      id: router.query.customerId,
+      name: router.query.customerName,
+      email: router.query.customerEmail
+    });
+    
     // Simulate getting the customer ID from session/local storage
     // In a real app, you would get this from authentication
     const getCustomerIdFromStorage = (): string | null => {
-      if (typeof window !== 'undefined') {
-        return localStorage.getItem('customerId');
-      }
-      return null;
+      return router.query.customerId as string || 
+        (typeof window !== 'undefined' ? localStorage.getItem('customerId') : null);
     };
 
     const getOrders = async () => {
@@ -54,9 +60,42 @@ const OrdersPage: React.FC = () => {
     getOrders();
   }, []);
 
+  const handleShopMore = () => {
+    // Only set customer ID when clicking Shop More
+    if (router.query.customerId) {
+      localStorage.setItem('customer', JSON.stringify({
+        id: router.query.customerId as string,
+        name: router.query.customerName as string,
+        email: router.query.customerEmail as string,
+        phone: router.query.customerPhone as string,
+        address: router.query.customerAddress as string
+      }));
+    }
+    router.push(router.query.customerId ? `/products?customerId=${router.query.customerId}` : '/products');
+  };
+
   return (
     <Layout title="Orders | Microservices Shop">
-      <div>
+      <div className="space-y-6">
+        {router.query.customerName && (
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-xl font-bold mb-2">Customer Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="font-semibold">Customer ID:</p>
+                <p>{router.query.customerId}</p>
+              </div>
+              <div>
+                <p className="font-semibold">Name:</p>
+                <p>{router.query.customerName}</p>
+              </div>
+              <div>
+                <p className="font-semibold">Email:</p>
+                <p>{router.query.customerEmail}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <h1 className="text-3xl font-bold mb-6">Your Orders</h1>
         
         {loading && (
@@ -172,9 +211,12 @@ const OrdersPage: React.FC = () => {
         
         {!loading && !error && orders.length > 0 && (
           <div className="mt-8 text-center">
-            <Link href="/products" className="btn btn-primary">
+            <button 
+              onClick={handleShopMore}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
               Shop More Products
-            </Link>
+            </button>
           </div>
         )}
       </div>

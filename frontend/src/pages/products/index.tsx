@@ -5,12 +5,15 @@ import { Product, CartItem } from '../../types';
 import { fetchProducts } from '../../utils/api';
 import { subscribeToCartUpdates, getCart, addToCart } from '../../utils/cartStorage';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 const ProductsPage: React.FC = () => {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [cartCount, setCartCount] = useState<number>(0);
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -37,9 +40,20 @@ const ProductsPage: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Get customer ID from query params only (no localStorage check)
+    if (router.query.customerId) {
+      setCustomerId(router.query.customerId as string);
+    }
+  }, [router.query]);
+
   const handleAddToCart = (product: Product) => {
     addToCart(product);
     toast.success(`${product.name} added to cart!`);
+  };
+
+  const handleCheckout = () => {
+    router.push(`/checkout${customerId ? `?customerId=${customerId}` : ''}`);
   };
 
   return (
@@ -70,6 +84,7 @@ const ProductsPage: React.FC = () => {
             <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
           ))}
         </div>
+        <button onClick={handleCheckout}>Checkout</button>
       </div>
     </Layout>
   );

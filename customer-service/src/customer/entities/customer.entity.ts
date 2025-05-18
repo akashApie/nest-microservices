@@ -22,4 +22,11 @@ export class Customer {
 
   @Column('uuid', { array: true, default: () => "'{}'" })
   orderIds: string[];
+
+  @Column({ type: 'jsonb', default: [] })
+  orderHistory: Array<{
+    orderId: string;
+    totalAmount: number;
+    createdAt: Date;
+  }>;
 }

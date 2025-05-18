@@ -99,6 +99,22 @@ export class CustomerService {
     }
   }
 
+  async addOrderToHistory(customerId: string, order: {
+    orderId: string;
+    totalAmount: number;
+    createdAt: Date;
+  }) {
+    const customer = await this.customerRepository.findOneBy({ id: customerId });
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${customerId} not found`);
+    }
+    
+    customer.orderHistory = customer.orderHistory || [];
+    customer.orderHistory.push(order);
+    
+    return this.customerRepository.save(customer);
+  }
+
   async remove(id: string): Promise<void> {
     try {
       this.logger.log(`Removing customer with ID: ${id}`);

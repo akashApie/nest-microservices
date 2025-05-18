@@ -6,14 +6,14 @@ import { OrderItem } from './entities/order-item.entity';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { OrderMessageHandlers } from './order.message-handlers';
-import { RmqClientModule } from '../messaging/rmq-client.provider';
+import { RabbitMQModule } from '../messaging/rabbitmq.module';
 import { ProductModule } from '../product/product.module';
 
 @Module({
   imports: [
+    RabbitMQModule,
     HttpModule,
     TypeOrmModule.forFeature([Order, OrderItem]),
-    RmqClientModule,
     ProductModule
   ],
   controllers: [OrderController, OrderMessageHandlers],

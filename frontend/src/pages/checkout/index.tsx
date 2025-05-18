@@ -27,6 +27,16 @@ const CheckoutPage: React.FC = () => {
       return;
     }
     
+    // Check for existing customer data
+    const savedCustomer = localStorage.getItem('customer');
+    if (savedCustomer) {
+      const { id, name, email, phone, address } = JSON.parse(savedCustomer);
+      setName(name);
+      setEmail(email);
+      setPhone(phone);
+      setAddress(address);
+    }
+    
     setCartItems(items);
     setTotal(getCartTotal());
   }, [router]);
@@ -41,30 +51,36 @@ const CheckoutPage: React.FC = () => {
     
     try {
       setLoading(true);
-      console.log('Submitting order...',name,
-        email,
-        phone,
-        address);
       
       // 1. Create/get customer
-      const customer = await createCustomer({
-        name,
-        email,
-        phone,
-        address
-      });
+      let customerId = '';
+      const savedCustomer = localStorage.getItem('customer');
       
-      console.log('Customer:', customer);
+      if (savedCustomer) {
+        customerId = JSON.parse(savedCustomer).id;
+      } else {
+        const customer = await createCustomer({ name, email, phone, address });
+        customerId = customer.id;
+        localStorage.setItem('customer', JSON.stringify({
+          id: customerId,
+          name,
+          email,
+          phone,
+          address
+        }));
+      }
+      
+      console.log('Customer:', { id: customerId, name, email, phone, address });
       
       // 2. Create order
-      const order = await createOrder(customer.id, cartItems);
+      const order = await createOrder(customerId, cartItems);
       console.log('Order:', order); 
       // 3. Clear cart
       clearCart();
       
       // 4. Save customer ID to localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('customerId', customer.id);
+        localStorage.setItem('customerId', customerId);
       }
       
       // 5. Show success and redirect to order confirmation

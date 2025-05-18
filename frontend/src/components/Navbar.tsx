@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { getCart } from '../utils/cartStorage';
+import { getCart, subscribeToCartUpdates } from '../utils/cartStorage';
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -25,6 +25,18 @@ const Navbar: React.FC = () => {
       router.events.off('routeChangeComplete', updateCartCount);
     };
   }, [router.events]);
+
+  React.useEffect(() => {
+    // Initial cart count
+    setCartItemsCount(getCart().reduce((sum: number, item: any) => sum + item.quantity, 0));
+    
+    // Subscribe to cart updates
+    const unsubscribe = subscribeToCartUpdates(() => {
+      setCartItemsCount(getCart().reduce((sum: number, item: any) => sum + item.quantity, 0));
+    });
+    
+    return () => unsubscribe();
+  }, []);
 
   const isActive = (pathname: string) => router.pathname === pathname;
   

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import ProductCard from '../../components/ProductCard';
-import { Product } from '../../types';
+import { Product, CartItem } from '../../types';
 import { fetchProducts } from '../../utils/api';
+import { subscribeToCartUpdates, getCart, addToCart } from '../../utils/cartStorage';
+import toast from 'react-hot-toast';
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [cartCount, setCartCount] = useState<number>(0);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -25,10 +28,22 @@ const ProductsPage: React.FC = () => {
     };
 
     getProducts();
+
+    // Subscribe to cart updates
+    const unsubscribe = subscribeToCartUpdates(() => {
+      setCartCount(getCart().reduce((sum: number, item: CartItem) => sum + item.quantity, 0));
+    });
+
+    return () => unsubscribe();
   }, []);
 
+  const handleAddToCart = (product: Product) => {
+    addToCart(product);
+    toast.success(`${product.name} added to cart!`);
+  };
+
   return (
-    <Layout title="Products | Microservices Shop">
+    <Layout title="Products | Microservices Shop" cartCount={cartCount}>
       <div>
         <h1 className="text-3xl font-bold mb-6">Products</h1>
         
@@ -52,7 +67,7 @@ const ProductsPage: React.FC = () => {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
           ))}
         </div>
       </div>

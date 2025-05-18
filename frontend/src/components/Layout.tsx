@@ -6,9 +6,10 @@ import { Toaster } from 'react-hot-toast';
 interface LayoutProps {
   children: ReactNode;
   title?: string;
+  cartCount?: number;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title = 'Microservices Demo' }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title = 'Microservices Demo', cartCount = 0 }) => {
   return (
     <>
       <Head>

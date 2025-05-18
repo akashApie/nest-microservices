@@ -8,6 +8,19 @@ export const getCart = (): CartItem[] => {
   return cartData ? JSON.parse(cartData) : [];
 };
 
+let listeners: (() => void)[] = [];
+
+export const subscribeToCartUpdates = (callback: () => void) => {
+  listeners.push(callback);
+  return () => {
+    listeners = listeners.filter(l => l !== callback);
+  };
+};
+
+const notifyCartUpdate = () => {
+  listeners.forEach(callback => callback());
+};
+
 // Add item to cart
 export const addToCart = (product: Product, quantity: number = 1): void => {
   const cart = getCart();
@@ -26,6 +39,7 @@ export const addToCart = (product: Product, quantity: number = 1): void => {
   }
   
   localStorage.setItem('cart', JSON.stringify(cart));
+  notifyCartUpdate();
 };
 
 // Update cart item quantity
@@ -43,6 +57,7 @@ export const updateCartItemQuantity = (productId: string, quantity: number): voi
     }
     
     localStorage.setItem('cart', JSON.stringify(cart));
+    notifyCartUpdate();
   }
 };
 
@@ -51,11 +66,13 @@ export const removeFromCart = (productId: string): void => {
   const cart = getCart();
   const updatedCart = cart.filter(item => item.productId !== productId);
   localStorage.setItem('cart', JSON.stringify(updatedCart));
+  notifyCartUpdate();
 };
 
 // Clear cart
 export const clearCart = (): void => {
   localStorage.setItem('cart', JSON.stringify([]));
+  notifyCartUpdate();
 };
 
 // Calculate cart total

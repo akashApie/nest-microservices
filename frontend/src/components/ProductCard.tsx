@@ -1,15 +1,15 @@
 import React from 'react';
 import { Product } from '../types';
-import { addToCart } from '../utils/cartStorage';
 import toast from 'react-hot-toast';
 
 interface ProductCardProps {
   product: Product;
+  onAddToCart?: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const handleAddToCart = () => {
-    addToCart(product, 1);
+    onAddToCart?.(product);
     toast.success(`Added ${product.name} to cart!`);
   };
 

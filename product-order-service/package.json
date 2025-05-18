@@ -11,6 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
+    "prestart:prod": "nest build",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -22,14 +23,17 @@
     "migration:generate": "npm run typeorm -- migration:generate -d ormconfig.js",
     "migration:run": "npm run typeorm -- migration:run -d ormconfig.js",
     "migration:revert": "npm run typeorm -- migration:revert -d ormconfig.js",
-    "seed": "ts-node -r tsconfig-paths/register src/seeds/run-seed.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/seeds/run-seed.ts",
+    "seed:products": "ts-node src/database/seed-runner.ts",
+    "start:dev:watch": "nodemon"
   },
   "dependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/core": "^9.0.0",
-    "@nestjs/microservices": "^9.0.0",
+    "@nestjs/common": "^9.4.3",
+    "@nestjs/config": "^2.3.4",
+    "@nestjs/core": "^9.4.3",
+    "@nestjs/microservices": "^9.4.3",
     "@nestjs/platform-express": "^9.0.0",
-    "@nestjs/swagger": "^6.0.0",
+    "@nestjs/swagger": "^6.3.0",
     "@nestjs/typeorm": "^9.0.0",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.8",
@@ -39,8 +43,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "^0.3.23",
-    "@nestjs/config": "^2.2.0"
+    "typeorm": "^0.3.23"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

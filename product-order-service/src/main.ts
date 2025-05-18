@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport, ClientProvider } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -21,14 +21,29 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
 
-  // Connect microservice
+  // Enable CORS for frontend
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true
+  });
+
+  // Configure microservices
   app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
+    transport: Transport.TCP,
     options: {
-      urls: [configService.get<string>('RABBITMQ_URI')],
-      queue: configService.get<string>('RABBITMQ_QUEUE'),
-      queueOptions: { durable: true },
-    },
+      host: '0.0.0.0',
+      port: configService.get<number>('TCP_PORT') || 3002
+    }
+  } as ClientProvider);
+
+  // Configure product service client
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      host: '0.0.0.0',
+      port: configService.get<number>('PRODUCT_TCP_PORT') || 3002
+    }
   });
 
   await app.startAllMicroservices();

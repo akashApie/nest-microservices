@@ -16,6 +16,10 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@customer-service/*": ["../customer-service/src/*"]
+    }
+  },
+  "include": ["src"]
 }

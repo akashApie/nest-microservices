@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { OrderService } from './order.service';
-import { CustomerCreatedEvent, CustomerUpdatedEvent, CustomerDeletedEvent, CUSTOMER_EVENTS } from '../messaging/events/customer-events';
+import { CustomerCreatedEvent, CustomerUpdatedEvent, CustomerDeletedEvent, CUSTOMER_EVENTS } from '@customer-service/messaging/events/customer-events';
 
 @Controller()
 export class OrderMessageHandlers {

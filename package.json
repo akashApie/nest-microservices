@@ -1,0 +1,14 @@
+{
+  "name": "microservices-root",
+  "private": true,
+  "scripts": {
+    "start:all": "concurrently \"cd frontend && npm start\" \"cd customer-service && npm run start:dev:watch\" \"cd product-order-service && npm run start:dev:watch\"",
+    "start:customer": "cd customer-service && npm run start:dev",
+    "start:product": "cd product-order-service && npm run start:dev",
+    "start:frontend": "cd frontend && npm run start",
+    "restart-services": "concurrently --kill-others \"cd customer-service && npm run start:dev\" \"cd product-order-service && npm run start:dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -2,8 +2,8 @@ import axios, { AxiosError } from 'axios';
 import { Product, Customer, Order, CartItem } from '../types';
 import toast from 'react-hot-toast';
 
-const CUSTOMER_API_URL = 'http://localhost:3000';
-const PRODUCT_API_URL = 'http://localhost:3001';
+const CUSTOMER_API_URL = 'http://localhost:3001';
+const PRODUCT_API_URL = 'http://localhost:3002';
 
 // Create Axios instances with default config
 const customerApi = axios.create({
@@ -39,9 +39,16 @@ const handleApiError = (error: unknown): never => {
 // Products API
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
+    console.log('[API] Fetching products from', productApi.defaults.baseURL);
     const response = await productApi.get('/products');
+    console.log('[API] Products response:', response);
     return response.data;
   } catch (error) {
+    console.error('[API] Products fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -51,6 +58,11 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     const response = await productApi.get(`/products/${id}`);
     return response.data;
   } catch (error) {
+    console.error('[API] Product fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -61,6 +73,11 @@ export const fetchCustomers = async (): Promise<Customer[]> => {
     const response = await customerApi.get('/customers');
     return response.data;
   } catch (error) {
+    console.error('[API] Customers fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -70,6 +87,11 @@ export const fetchCustomerById = async (id: string): Promise<Customer> => {
     const response = await customerApi.get(`/customers/${id}`);
     return response.data;
   } catch (error) {
+    console.error('[API] Customer fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -81,6 +103,11 @@ export const createCustomer = async (
     const response = await customerApi.post('/customers', customer);
     return response.data;
   } catch (error) {
+    console.error('[API] Customer creation failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -91,6 +118,11 @@ export const fetchOrders = async (): Promise<Order[]> => {
     const response = await productApi.get('/orders');
     return response.data;
   } catch (error) {
+    console.error('[API] Orders fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -100,6 +132,11 @@ export const fetchOrdersByCustomerId = async (customerId: string): Promise<Order
     const response = await productApi.get(`/orders/customer/${customerId}`);
     return response.data;
   } catch (error) {
+    console.error('[API] Orders fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -109,6 +146,11 @@ export const fetchOrderById = async (id: string): Promise<Order> => {
     const response = await productApi.get(`/orders/${id}`);
     return response.data;
   } catch (error) {
+    console.error('[API] Order fetch failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };
@@ -130,6 +172,11 @@ export const createOrder = async (customerId: string, items: CartItem[]): Promis
     
     return response.data;
   } catch (error) {
+    console.error('[API] Order creation failed:', {
+      error: error as Error,
+      config: (error as AxiosError).config,
+      response: (error as AxiosError).response?.data
+    });
     return handleApiError(error);
   }
 };

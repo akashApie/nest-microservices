@@ -1,6 +1,6 @@
 import { Injectable, LoggerService, Scope } from '@nestjs/common';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable()
 export class AppLogger implements LoggerService {
   private context?: string;
 

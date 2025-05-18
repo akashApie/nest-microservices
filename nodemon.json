@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "customer-service/src/**/*.ts",
+    "product-order-service/src/**/*.ts"
+  ],
+  "ext": "ts",
+  "ignore": [
+    "**/*.spec.ts",
+    "node_modules"
+  ],
+  "exec": "npm run restart-services"
+}

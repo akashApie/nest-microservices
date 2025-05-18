@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport, ClientProvider } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -33,15 +33,25 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
 
-  // Connect microservice
+  // Configure microservice
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [configService.get<string>('RABBITMQ_URI')],
-      queue: configService.get<string>('RABBITMQ_QUEUE'),
-      queueOptions: { durable: true },
-    },
+      urls: [configService.get<string>('RMQ_URL') ?? 'amqp://localhost:5672'] as string[],
+      queue: 'customer_queue',
+      queueOptions: {
+        durable: true
+      },
+    }
   });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      host: '0.0.0.0',
+      port: 3003
+    }
+  } as ClientProvider);
 
   await app.startAllMicroservices();
   const port = configService.get<number>('PORT') || 3000;

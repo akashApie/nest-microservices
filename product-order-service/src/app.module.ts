@@ -6,17 +6,24 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development' }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: typeOrmConfig,
+      useFactory: () => typeOrmConfig,
     }),
     ProductModule,
     OrderModule,
+    ClientsModule.register([{
+      name: 'CUSTOMER_SERVICE',
+      transport: Transport.TCP,
+      options: {
+        host: '0.0.0.0',
+        port: 3001
+      }
+    }]),
   ],
   controllers: [AppController],
   providers: [AppService],

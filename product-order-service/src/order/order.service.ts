@@ -7,8 +7,8 @@ import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../product/entities/product.entity';
 import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { CustomerCreatedEvent, CustomerUpdatedEvent } from '../messaging/events/customer-events';
 import { OrderCreatedEvent } from '../messaging/events/order-events';
+import { CustomerCreatedEvent, CustomerUpdatedEvent } from '@customer-service/messaging/events/customer-events';
 
 @Injectable()
 export class OrderService {

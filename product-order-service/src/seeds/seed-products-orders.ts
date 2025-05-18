@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
-import { Product } from '../product/product.entity';
-import { Order } from '../order/order.entity';
+import { Product } from '../products/entities/product.entity';
+import { Order } from '../order/entities/order.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 

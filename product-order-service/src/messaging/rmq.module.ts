@@ -12,19 +12,19 @@ import { RmqClientModule } from './rmq-client.provider';
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [configService.get<string>('RABBITMQ_URI')],
-            queue: 'order_queue',
-            queueOptions: { 
-              durable: true,
-              arguments: {
-                'x-dead-letter-exchange': 'order_dlx',
-                'x-dead-letter-routing-key': 'order_dlq',
-              },
-            },
-          },
-        }),
+  transport: Transport.RMQ,
+  options: {
+    urls: [configService.get<string>('RMQ_URL') ?? 'amqp://localhost:5672'] as string[],
+    queue: configService.get<string>('RMQ_QUEUE_NAME') ?? 'customer_queue',
+    queueOptions: {
+      durable: true,
+      arguments: {
+        'x-dead-letter-exchange': 'dead_letters',
+        'x-dead-letter-routing-key': 'dead_letters'
+      }
+    }
+  }
+}),
       },
     ]),
   ],

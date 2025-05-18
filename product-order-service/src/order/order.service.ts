@@ -94,6 +94,13 @@ export class OrderService {
   }
 
   // Find orders by customer ID
+  async findByCustomerId(customerId: string): Promise<Order[]> {
+    return this.orderRepository.find({ 
+      where: { customerId },
+      relations: ['items', 'items.product']
+    });
+  }
+
   async findOrdersByCustomerId(customerId: string): Promise<Order[]> {
     this.logger.log(`Finding orders for customer: ${customerId}`);
     return this.orderRepository.find({

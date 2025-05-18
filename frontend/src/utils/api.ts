@@ -146,7 +146,7 @@ export const fetchOrders = async (): Promise<Order[]> => {
 
 export const fetchOrdersByCustomerId = async (customerId: string): Promise<Order[]> => {
   try {
-    const response = await customerApi.get(`/orders/customer/${customerId}`);
+    const response = await productApi.get(`/orders/customer/${customerId}`);
     return response.data;
   } catch (error) {
     console.error('[API] Orders fetch failed:', {

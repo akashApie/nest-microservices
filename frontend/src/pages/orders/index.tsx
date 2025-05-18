@@ -144,8 +144,8 @@ const OrdersPage: React.FC = () => {
                         <tr key={item.id}>
                           <td className="px-4 py-2">{item.product ? item.product.name : `Product #${item.productId}`}</td>
                           <td className="px-4 py-2">{item.quantity}</td>
-                          <td className="px-4 py-2">${item.price.toFixed(2)}</td>
-                          <td className="px-4 py-2">${(item.price * item.quantity).toFixed(2)}</td>
+                          <td className="px-4 py-2">${Number(item.price || 0).toFixed(2)}</td>
+                          <td className="px-4 py-2">${(Number(item.price || 0) * item.quantity).toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -162,7 +162,7 @@ const OrdersPage: React.FC = () => {
                     )}
                   </div>
                   <div className="text-lg font-bold">
-                    Total: ${order.totalAmount.toFixed(2)}
+                    <p className="text-lg font-semibold">Total: ${Number(order.totalAmount || 0).toFixed(2)}</p>
                   </div>
                 </div>
               </div>

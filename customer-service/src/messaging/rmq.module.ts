@@ -11,24 +11,30 @@ import { RmqClientModule } from './rmq-client.provider';
         name: 'CUSTOMER_SERVICE',
         imports: [ConfigModule],
         inject: [ConfigService],
-        // customer-service/src/messaging/rmq.module.ts
         useFactory: (configService: ConfigService): ClientProvider => ({
           transport: Transport.RMQ,
           options: {
-            urls: [configService.get<string>('RMQ_URL') ?? 'amqp://localhost:5672'] as string[],
+            urls: [configService.get<string>('RMQ_URL') ?? 'amqp://localhost:5672'],
             queue: 'customer_queue',
-            queueOptions: { 
+            noAck: false,
+            prefetchCount: 1,
+            queueOptions: {
               durable: true,
               arguments: {
-                'x-dead-letter-exchange': 'customer_dlx',
-                'x-dead-letter-routing-key': 'customer_dlq'
+                'x-dead-letter-exchange': 'orders.dlx',
+                'x-message-ttl': 60000,
+                'x-dead-letter-routing-key': 'customer_queue.dead'
               }
+            },
+            socketOptions: {
+              heartbeatIntervalInSeconds: 60,
+              reconnectTimeInSeconds: 5
             }
           }
         })
       },
     ]),
   ],
-  exports: [RmqClientModule, 'CUSTOMER_SERVICE'],
+  exports: [RmqClientModule, ClientsModule],
 })
 export class RmqModule {}

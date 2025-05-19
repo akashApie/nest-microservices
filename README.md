@@ -146,6 +146,37 @@ npm run dev
 
 ---
 
+## Event-Driven Workflow
+
+### Order Creation Flow
+1. Frontend submits order to OrderService
+2. OrderService:
+   - Creates order record
+   - Publishes `order.created` event to RabbitMQ
+   - Event contains: `orderId`, `customerId`, `products`, `totalAmount`, `createdAt`
+
+3. CustomerService:
+   - Consumes `order.created` events
+   - Updates customer's order history
+   - Implements idempotency to handle duplicate messages
+
+### RabbitMQ Configuration
+- Exchange: `orders.exchange` (topic)
+- Queues:
+  - `orders.queue` (Order Service)
+  - `customers.queue` (Customer Service)
+- Routing Keys:
+  - `order.created`
+  - `order.updated`
+
+## Message Reliability
+- Durable queues
+- Manual acknowledgements
+- Dead-letter exchange for failed messages
+- Retry mechanism (3 attempts)
+
+---
+
 ## API Documentation (Swagger)
 
 - Customer Service: [http://localhost:3000/api](http://localhost:3000/api)
